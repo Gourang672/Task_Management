@@ -38,6 +38,7 @@ export default function DashboardPage() {
   const [editTitle, setEditTitle] = useState('');
   const [editDescription, setEditDescription] = useState('');
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
 
   // User management state
   const [isProfileDialogOpen, setIsProfileDialogOpen] = useState(false);
@@ -196,6 +197,11 @@ export default function DashboardPage() {
   const tasks = tasksData?.data?.tasks || [];
   const stats = tasksData?.data?.statistics;
   const pagination = tasksData?.data?.pagination;
+
+  // Filter tasks based on search term
+  const filteredTasks = tasks.filter(task =>
+    task.title.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   // Calculate statistics from tasks if not provided by backend
   const totalTasks = tasks.length;
@@ -377,17 +383,43 @@ export default function DashboardPage() {
             <p className="text-gray-400">Manage and track your productivity</p>
           </div>
 
-          {tasks.length === 0 ? (
+          {/* Search Input */}
+          <div className="mb-6">
+            <div className="relative">
+              <input
+                type="text"
+                placeholder="Search tasks by title..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="w-full px-4 py-3 bg-gray-800/50 border border-gray-600/50 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-all duration-300 backdrop-blur-sm"
+              />
+              <div className="absolute inset-0 bg-gradient-to-r from-indigo-500/5 to-purple-500/5 rounded-xl opacity-0 focus-within:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
+            </div>
+          </div>
+
+          {filteredTasks.length === 0 ? (
             <div className="text-center py-12">
-              <div className="w-16 h-16 bg-gradient-to-br from-gray-600 to-gray-700 rounded-full flex items-center justify-center mx-auto mb-4">
-                <span className="text-2xl">📝</span>
-              </div>
-              <h3 className="text-xl font-semibold text-white mb-2">No tasks yet</h3>
-              <p className="text-gray-400">Create your first task above to get started!</p>
+              {tasks.length === 0 ? (
+                <>
+                  <div className="w-16 h-16 bg-gradient-to-br from-gray-600 to-gray-700 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <span className="text-2xl">📝</span>
+                  </div>
+                  <h3 className="text-xl font-semibold text-white mb-2">No tasks yet</h3>
+                  <p className="text-gray-400">Create your first task above to get started!</p>
+                </>
+              ) : (
+                <>
+                  <div className="w-16 h-16 bg-gradient-to-br from-gray-600 to-gray-700 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <span className="text-2xl">🔍</span>
+                  </div>
+                  <h3 className="text-xl font-semibold text-white mb-2">No tasks found</h3>
+                  <p className="text-gray-400">Try adjusting your search term.</p>
+                </>
+              )}
             </div>
           ) : (
             <div className="space-y-4">
-              {tasks.map((task, index) => (
+              {filteredTasks.map((task, index) => (
                 <div key={task.id || task._id || `task-${index}`} className="group relative bg-gradient-to-r from-gray-700/50 to-gray-800/50 backdrop-blur-sm p-6 rounded-xl border border-gray-600/50 hover:border-indigo-400/30 transition-all duration-300 hover:transform hover:scale-[1.02]">
                   <div className="absolute inset-0 bg-gradient-to-r from-indigo-600/5 to-purple-600/5 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                   <div className="relative z-10 flex justify-between items-start">
@@ -455,7 +487,7 @@ export default function DashboardPage() {
                   size="sm"
                   onClick={() => handlePageChange(currentPage - 1)}
                   disabled={!pagination.hasPrevPage}
-                  className="border-gray-600/50 text-gray-300 hover:bg-gray-700/50 hover:border-indigo-400/50 backdrop-blur-sm transition-all duration-300"
+                  className="border-gray-600/50 text-black hover:bg-gray-700/50 hover:border-indigo-400/50 backdrop-blur-sm transition-all duration-300"
                 >
                   <ChevronLeft className="h-4 w-4 mr-1" />
                   Previous
@@ -470,7 +502,7 @@ export default function DashboardPage() {
                   size="sm"
                   onClick={() => handlePageChange(currentPage + 1)}
                   disabled={!pagination.hasNextPage}
-                  className="border-gray-600/50 text-gray-300 hover:bg-gray-700/50 hover:border-indigo-400/50 backdrop-blur-sm transition-all duration-300"
+                  className="border-gray-600/50 text-black hover:bg-gray-700/50 hover:border-indigo-400/50 backdrop-blur-sm transition-all duration-300"
                 >
                   Next
                   <ChevronRight className="h-4 w-4 ml-1" />
